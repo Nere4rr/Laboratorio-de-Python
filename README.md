@@ -9,7 +9,7 @@ Repositorio del grupo C 35. Aquí encontrará el desarrollo del taller de Python
 - VALUSSI MELENDES, Fabrizio Francisco
 
 ¿Qué se encuentra en este repositorio?
--
--
+- :v
+- :V
 -
 -
