@@ -5,7 +5,7 @@ Repositorio del grupo C 35. Aquí encontrará el desarrollo del taller de Python
 - ARRIAZU, Nerea Micaela 
 - BARCALA, Martin Andres
 - FRANCO, Gastón Agustin 
-- GONZLEZ, Irina 
+- GONZALEZ, Irina 
 - VALUSSI MELENDES, Fabrizio Francisco
 
 ¿Qué se encuentra en este repositorio?
