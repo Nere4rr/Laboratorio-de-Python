@@ -1,0 +1,27 @@
+4. Simulador de cajero automático
+El sistema deberá simular operaciones básicas de un cajero automático. La solución podrá incluir validación de acceso mediante usuario y contraseña, consulta de saldo, extracción, depósitos y transferencias simples.
+
+También podrá contemplarse control de saldo insuficiente, límites de extracción y registro básico de operaciones realizadas.
+
+
+  * Consultar saldo.
+  * Extraer plata.
+  * Depositar plata.
+  * Transferir plata ¿.
+  * Ver el historial de operaciones.
+  * Solicitar usuario y contraseña.
+  * Permitir hasta 3 intentos de inicio de sesión o 2 o 4 o ns
+  * Si el acceso es correcto, muestra un menú que permanece activo hasta seleccionar Salir/terminar.
+  * Hay que usar extructuras simples (if, elif, else, while, funciones, contadores, acumuladores).
+
+"posible" menú:
+
+1. Consultar saldo
+2. Extraer dinero
+3. Depositar dinero
+4. Transferir dinero
+5. Ver historial de operaciones
+6. Salir/terminar
+
+:)
+
