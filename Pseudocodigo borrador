@@ -1,0 +1,148 @@
+Accion SimuladorCajero Es
+AMBIENTE
+    RegCliente = REGISTRO
+        nro_usuario : entero      
+        pin : entero
+        saldo : real
+        limite_extraccion : real
+        activo : logico           
+    FIN_REGISTRO
+
+    ArchClientes : Archivo de RegCliente Indexado por nro_usuario
+    regCli : RegCliente
+
+    usu_ingresado, pin_ingresado : entero
+    intentos, opcion : entero
+    monto, cuenta_destino : real
+    acceso_concedido : logico
+    cant_depositos, cant_extracciones, cant_transferencias : entero
+
+    Procedimiento ConsultarSaldo() es
+        ESC("Su saldo actual es: $", regCli.saldo)
+    Fin Procedimiento
+
+    Procedimiento Depositar() es
+        ESC("Ingrese el monto a depositar:")
+        LEER(monto)
+        SI monto > 0 ENTONCES
+            regCli.saldo := regCli.saldo + monto 
+            REGRABAR(ArchClientes, regCli) 
+            cant_depositos := cant_depositos + 1
+            ESC("Depósito exitoso.")
+        Sino
+            ESC("Error: Monto inválido.")
+        Fin si
+    Fin Procedimiento
+
+    Procedimiento Extraer() es
+        ESC("Ingrese el monto a extraer:")
+        LEER(monto)
+        SI monto > regCli.limite_extraccion ENTONCES
+            ESC("Error: Supera el límite diario de $", regCli.limite_extraccion)
+        Sino 
+            SI monto > regCli.saldo ENTONCES
+                ESC("Error: Saldo insuficiente.")
+            Sino
+                SI monto > 0 ENTONCES
+                    regCli.saldo := regCli.saldo - monto
+                    REGRABAR(ArchClientes, regCli) 
+                    cant_extracciones := cant_extracciones + 1
+                    ESC("Extracción exitosa. Retire su dinero.")
+                Sino
+                    ESC("Error: Monto inválido.")
+                Fin si
+            Fin Si
+        Fin si
+    Fin Procedimiento
+
+    Procedimiento Transferir() es
+        ESC("Ingrese el CBU/Cuenta destino (sólo números):")
+        LEER(cuenta_destino)
+        ESC("Ingrese el monto a transferir:")
+        LEER(monto)
+        SI monto > regCli.saldo ENTONCES
+            ESC("Error: Saldo insuficiente.")
+        Sino 
+            SI monto > 0 ENTONCES
+                regCli.saldo := regCli.saldo - monto
+                REGRABAR(ArchClientes, regCli) 
+                cant_transferencias := cant_transferencias + 1
+                ESC("Transferencia exitosa a la cuenta ", cuenta_destino)
+            Sino
+                ESC("Error: Monto inválido.")
+            Fin si
+        Fin si
+    Fin Procedimiento
+
+    Procedimiento MostrarRegistro() es
+        ESC("=== REGISTRO DE OPERACIONES DE LA SESIÓN ===")
+        ESC("Depósitos: ", cant_depositos)
+        ESC("Extracciones: ", cant_extracciones)
+        ESC("Transferencias: ", cant_transferencias)
+    Fin Procedimiento
+
+PROCESO
+    intentos := 0
+    acceso_concedido := FALSO
+    cant_depositos := 0
+    cant_extracciones := 0
+    cant_transferencias := 0
+
+    Abrir E/S (ArchClientes)
+
+    ESC("=== Bienvenido al Cajero Automático ===")
+
+    MIENTRAS intentos < 3 Y acceso_concedido = FALSO HACER
+        ESC("Ingrese su número de usuario:")
+        LEER(usu_ingresado)
+        ESC("Ingrese su PIN:")
+        LEER(pin_ingresado)
+
+        CLAVE := usu_ingresado
+        LEER(ArchClientes, regCli)
+
+        SI NFDA(ArchClientes) ENTONCES
+            SI pin_ingresado = regCli.pin Y regCli.activo = VERDADERO ENTONCES
+                acceso_concedido := VERDADERO
+            Sino
+                intentos := intentos + 1
+                ESC("PIN incorrecto o cuenta inactiva. Intentos restantes: ", 3 - intentos)
+            Fin si   
+        Sino
+            intentos := intentos + 1
+            ESC("Usuario inexistente en la base de datos. Intentos restantes: ", 3 - intentos)
+        Fin si
+    FIN_MIENTRAS
+
+    SI acceso_concedido = VERDADERO ENTONCES
+        REPETIR
+            ESC("=== MENÚ PRINCIPAL ===")
+            ESC("1. Consultar Saldo")
+            ESC("2. Depositar")
+            ESC("3. Extraer")
+            ESC("4. Transferir")
+            ESC("5. Ver Registro de Operaciones")
+            ESC("6. Salir")
+            ESC("Seleccione una opción:")
+            LEER(opcion)
+
+            SEGUN opcion HACER
+                = 1: ConsultarSaldo()
+                = 2: Depositar()
+                = 3: Extraer()
+                = 4: Transferir()
+                = 5: MostrarRegistro()
+                = 6: ESC("Gracias por operar con nosotros.")
+            FIN_SEGUN
+
+            SI opcion < 1 O opcion > 6 ENTONCES
+                ESC("Opción no válida.")
+            Fin si
+
+        HASTA QUE opcion = 6
+    Sino
+        ESC("Cuenta bloqueada. Contacte a su banco.")
+    Fin si
+
+    CERRAR(ArchClientes)
+FACCION
