@@ -1,0 +1,123 @@
+# piton prueba 1
+from dataclasses import dataclass
+
+@dataclass
+class RegCliente:
+    nro_usuario: str
+    pin: str
+    saldo: float
+    limite_extraccion: float
+    activo: bool
+
+# 2. NUEVA FUNCIÓN: Crear cuenta dinámicamente
+def crear_cuenta():
+    """Función para registrar un nuevo usuario desde el teclado"""
+    print("--- CREACIÓN DE NUEVA CUENTA ---")
+    nuevo_usu = input("Cree su nombre de usuario: ")
+    nuevo_pin = input("Cree su PIN numérico: ")
+    
+    # Convertimos los ingresos de texto a números decimales (float)
+    saldo_inicial = float(input("Ingrese su saldo inicial depositado: $"))
+    limite = float(input("Ingrese su límite de extracción deseado: $"))
+    
+    print("✅ ¡Cuenta creada con éxito!\n")
+    
+    # Retornamos el registro inicializado con los datos del usuario
+    return RegCliente(nuevo_usu, nuevo_pin, saldo_inicial, limite, True)
+
+# 3. Función de Login
+def login(cliente):
+    """Función que maneja el inicio de sesión con un máximo de 3 intentos"""
+    intentos = 0
+    while intentos < 3 and cliente.activo:
+        print("--- INICIO DE SESIÓN ---")
+        usu_ingreso = input("Ingrese su usuario: ")
+        pin_ingreso = input("Ingrese su PIN: ")
+
+        if usu_ingreso == cliente.nro_usuario and pin_ingreso == cliente.pin:
+            print("\n✅ Acceso autorizado. ¡Bienvenido!")
+            return True
+        else:
+            intentos += 1
+            print(f"❌ Datos incorrectos. Intentos restantes: {3 - intentos}\n")
+    
+    print("\n🔒 Cuenta bloqueada por seguridad tras 3 intentos fallidos.")
+    cliente.activo = False
+    return False
+
+# 4. Función del Menú
+def mostrar_menu():
+    """Función para imprimir el menú y retornar la opción elegida"""
+    print("\n--- MENÚ CAJERO AUTOMÁTICO ---")
+    print("1. Consultar saldo")
+    print("2. Extraer dinero")
+    print("3. Depositar dinero")
+    print("4. Transferir")
+    print("5. Salir")
+    return int(input("Seleccione una opción: "))
+
+# 5. Programa Principal
+def simular_cajero():
+    # En lugar de usar valores fijos, llamamos a la función para que el usuario cree sus datos
+    cliente = crear_cuenta()
+    
+    cant_extracciones = 0
+    cant_depositos = 0
+    cant_transferencias = 0
+
+    if login(cliente):
+        opcion = 0
+        
+        while opcion != 5:
+            opcion = mostrar_menu()
+
+            if opcion == 1:
+                print(f"💰 Su saldo actual es: ${cliente.saldo:.2f}")
+
+            elif opcion == 2:
+                monto = float(input("Ingrese el monto a extraer: $"))
+                if monto <= 0:
+                    print("⚠️ Error: Ingrese un monto válido mayor a 0.")
+                elif monto > cliente.limite_extraccion:
+                    print(f"⚠️ Error: Supera su límite de extracción de ${cliente.limite_extraccion:.2f}.")
+                elif monto > cliente.saldo:
+                    print("⚠️ Error: Saldo insuficiente para esta operación.")
+                else:
+                    cliente.saldo -= monto
+                    cant_extracciones += 1
+                    print(f"✅ Extracción exitosa. Por favor retire sus ${monto:.2f}")
+
+            elif opcion == 3:
+                monto = float(input("Ingrese el monto a depositar: $"))
+                if monto > 0:
+                    cliente.saldo += monto
+                    cant_depositos += 1
+                    print(f"✅ Depósito realizado. Su nuevo saldo es ${cliente.saldo:.2f}")
+                else:
+                    print("⚠️ Error: Ingrese un monto válido mayor a 0.")
+
+            elif opcion == 4:
+                cuenta_destino = input("Ingrese el CBU de la cuenta destino: ")
+                monto = float(input("Ingrese el monto a transferir: $"))
+                if monto <= 0:
+                    print("⚠️ Error: El monto debe ser mayor a 0.")
+                elif monto > cliente.saldo:
+                    print("⚠️ Error: Saldo insuficiente para la transferencia.")
+                else:
+                    cliente.saldo -= monto
+                    cant_transferencias += 1
+                    print(f"✅ Transferencia de ${monto:.2f} a la cuenta {cuenta_destino} realizada con éxito.")
+
+            elif opcion == 5:
+                print("\nSaliendo del sistema...")
+                print("--- RESUMEN DE OPERACIONES ---")
+                print(f"Extracciones realizadas: {cant_extracciones}")
+                print(f"Depósitos realizados: {cant_depositos}")
+                print(f"Transferencias realizadas: {cant_transferencias}")
+                print("Gracias por operar con nuestro banco.")
+
+            else:
+                print("⚠️ Opción inválida. Intente nuevamente eligiendo del 1 al 5.")
+
+# Ejecución del programa
+simular_cajero()
