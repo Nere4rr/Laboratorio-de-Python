@@ -121,3 +121,185 @@ def simular_cajero():
 
 # Ejecución del programa
 simular_cajero()
+
+
+
+##################
+piton borrador 2
+#############
+
+#######################
+ Datos del usuario 
+#######################
+
+usuario_db = {
+    "nro_usuario": 123456,
+    "pin": 1234,
+    "saldo": 100000.00,
+    "limite_extraccion": 30000.00,
+    "activo": True
+}
+
+#######################
+ Variables 
+#######################
+intentos = 0
+acceso_concedido = False
+
+cant_depositos = 0
+cant_extracciones = 0
+cant_transferencias = 0
+
+movimientos = []  
+#######################
+FUNCIONES
+#######################
+
+def movimientos(descripcion):
+    movimientos.append(descripcion)
+def consultar_saldo():
+    print(f"Su saldo actual es: ${usuario_db['saldo']:.2f}")
+    movimientos("Consulta de saldo")
+
+def depositar_plata():
+    global cant_depositos
+
+    try:
+        monto = float(input("Ingrese el monto a depositar: "))
+
+        if monto > 0:
+            usuario_db["saldo"] += monto
+            cant_depositos += 1
+
+            movimientos("Depósito")
+
+            print("Depósito exitoso.")
+            print(f"Saldo actual: ${usuario_db['saldo']:.2f}")
+        else:
+            print("Error: monto inválido.")
+
+    except ValueError:
+        print("Error: debe ingresar un número.")
+
+def extraer_plata():
+    global cant_extracciones
+    try:
+        monto = float(input("Ingrese el monto a extraer: "))
+
+            if monto > usuario_db["limite_extraccion"] and monto > 0 :
+                print("Error: supera el límite de extracción.")
+            elif monto > usuario_db["saldo"]:
+                print("Error: saldo insuficiente.")
+            else:
+                usuario_db["saldo"] -= monto
+                cant_extracciones += 1
+
+	            movimientos("Extracción")
+
+                print("Extracción exitosa.")
+                print(f"Saldo actual: ${usuario_db['saldo']:.2f}")
+        else:
+            print("Error: monto inválido.")
+
+    except ValueError:
+        print("Error: debe ingresar un número.")
+
+def transferir_plata():
+    global cant_transferencias
+    try:
+        cuenta = input("Ingrese cuenta destino: ")
+        if cuenta != "":
+            monto = float(input("Ingrese monto a transferir: "))
+            if monto > 0:
+
+                if  monto > 0 and monto > usuario_db["saldo"]:
+                    print("Error: saldo insuficiente.")
+                else:
+                    usuario_db["saldo"] -= monto
+                    cant_transferencias += 1
+
+                    movimientos(f"Transferencia a cuenta {cuenta}")
+
+                    print("Transferencia exitosa.")
+                    print(f"Saldo actual: ${usuario_db['saldo']:.2f}")
+            else:
+                print("Error: monto inválido.")
+        else:
+            print("Debe ingresar una cuenta válida.")
+    except ValueError:
+        print("Error: debe ingresar un número.")
+
+def mostrar_movimientos():
+    print("\n=== MOVIMIENTOS ===")
+    if len(movimientos) == 0:
+        print("No hay movimientos.")
+    else:
+        for m in movimientos:
+            print("-", m)
+    print("\nResumen:")
+    print("Depósitos:", cantdepositos)
+    print("Extracciones:", cantextracciones)
+    print("Transferencias:", canttransferencias)
+
+
+#################
+INICIO DE SESIÓN
+###################
+while intentos < 3 (coraSon) and not acceso_concedido:
+    try:
+        usuario = int(input("Ingrese número de usuario: "))
+        pin = int(input("Ingrese PIN: "))
+
+        if usuario == usuario_db["nro_usuario"] and pin == usuario_db["pin"] and usuario_db["activo"]:
+            acceso_concedido = True
+            print("Acceso concedido.")
+        else:
+            intentos += 1
+            print(f"Datos incorrectos. Intentos restantes: {3 - intentos}")
+
+    except ValueError:
+        intentos += 1
+        print(f"Error. Intentos restantes: {3 - intentos}")
+
+
+#####################
+ MENÚ PRINCIPAL
+#####################
+if acceso_concedido:
+    opcion = 0
+    while opcion != 6:
+
+        print("\n===== CAJERO AUTOMÁTICO =====")
+        print("1. Consultar saldo")
+        print("2. Depositar")
+        print("3. Extraer")
+        print("4. Transferir")
+        print("5. Movimientos")
+        print("6. Salir")
+
+        try:
+            opcion = int(input("Seleccione opción: "))
+            if opcion == 1:
+                consultar_saldo()
+            elif opcion == 2:
+                depositar_plata()
+            elif opcion == 3:
+                extraer_plata()
+            elif opcion == 4:
+                transferir_plata()
+            elif opcion == 5:
+                mostrar_movimientos()
+            elif opcion == 6:
+                print("Gracias por operar con nosotros.")
+
+            else:
+                print("Opción inválida.")
+
+        except ValueError:
+            print("Debe ingresar un número.")
+
+else:
+    print("Cuenta bloqueada.")
+
+break
+
