@@ -271,3 +271,79 @@ Procedimiento Iniciar_Sesion() es
 
 FP
 ##########################################
+
+
+
+
+
+
+##############################################
+Procedimiento Crear_Usuario() es
+
+    ESC("Ingrese número de usuario:")
+    LEER(nuevo_usuario)
+
+    ESC("Ingrese PIN:")
+    LEER(nuevo_pin)
+
+    ABRIR E/S(ArchClientes)
+
+    LEER(ArchClientes, regCli)
+
+    existe := FALSO
+
+    MIENTRAS NO FDA(ArchClientes) HACER
+
+        SI regCli.nro_usuario = nuevo_usuario ENTONCES
+            existe := VERDADERO
+        FIN SI
+
+        LEER(ArchClientes, regCli)
+
+    FIN_MIENTRAS
+
+    SI existe = FALSO ENTONCES
+
+        regCli.nro_usuario := nuevo_usuario
+        regCli.pin := nuevo_pin
+        regCli.saldo := 100000
+        regCli.limite_extraccion := 30000
+        regCli.activo := VERDADERO
+
+        GRABAR(ArchClientes, regCli)
+
+        ESC("Usuario creado correctamente")
+
+    SINO
+
+        ESC("El usuario ya existe")
+
+    FIN SI
+
+FP
+##########################################
+
+##########################################
+REPETIR
+
+    ESC("1. Iniciar sesión")
+    ESC("2. Crear usuario")
+    ESC("3. Salir")
+
+    LEER(opcion)
+
+    SEGUN opcion HACER
+
+        1:
+            acceso := Iniciar_Sesion()
+
+        2:
+            Crear_Usuario()
+
+        3:
+            ESC("Saliendo")
+
+    FIN SEGUN
+
+HASTA QUE opcion = 3 O acceso = VERDADERO
+#################################
