@@ -160,7 +160,7 @@ Procedimiento Mostrar_movimientos() es
         ESC("Transferencias: ", cant_transferencias)
     Fp
 
-
+############################################
 PROCESO
     intentos := 0
     acceso_concedido := FALSO
@@ -228,3 +228,46 @@ PROCESO
     //CERRAR(archmovimientos)
 FACCION
 
+
+Procedimiento Iniciar_Sesion() es
+
+    intentos := 0
+    acceso := FALSO
+
+    MIENTRAS intentos < 3 Y acceso = FALSO HACER
+
+        ESC("Ingrese usuario:")
+        LEER(usuario_ingresado)
+
+        ESC("Ingrese PIN:")
+        LEER(pin_ingresado)
+
+        ABRIR E/S(ArchClientes)
+
+        LEER(ArchClientes, regCli)
+
+        MIENTRAS NO FDA(ArchClientes) Y regCli.nro_usuario <> usuario_ingresado HACER
+            LEER(ArchClientes, regCli)
+        FIN_MIENTRAS
+
+        SI regCli.nro_usuario = usuario_ingresado ENTONCES
+
+            SI regCli.pin = pin_ingresado ENTONCES
+                acceso := VERDADERO
+                ESC("Acceso concedido")
+            SINO
+                ESC("PIN incorrecto")
+                intentos := intentos + 1
+            FIN SI
+
+        SINO
+            ESC("Usuario no existe")
+            intentos := intentos + 1
+        FIN SI
+
+    FIN_MIENTRAS
+
+    RETORNAR acceso
+
+FP
+##########################################
