@@ -11,6 +11,17 @@ AMBIENTE
     ArchClientes : Archivo de RegCliente Indexado por nro_usuario
     regCli : RegCliente
 
+        ################
+        Movimientos = REGISTRO
+            nro_usuario: N(6)
+            descripcion: AN(30)
+        FR
+           
+        ArchMovimientos: Archivo de movimientos ordenado por nro_usuario 
+        regMov: Movimientos
+        #################
+
+
     usu_ingresado, pin_ingresado : entero
     intentos, opcion : entero
     monto, cuenta_destino : real
@@ -19,24 +30,45 @@ AMBIENTE
 
     Procedimiento ConsultarSaldo() es
         ESC("Su saldo actual es: $", regCli.saldo)
-    Fin Procedimiento
 
-    Procedimiento Depositar() es
+        ################
+        regMov.nro_usuario := regCli.nro_usuario
+        regMov.descripcion := "Consulta de saldo"
+
+        GRABAR(ArchMovimientos, regMov)
+        #######################
+    Fp
+   
+
+
+    Procedimiento Depositar_plata() es
         ESC("Ingrese el monto a depositar:")
         LEER(monto)
+
         SI monto > 0 ENTONCES
             regCli.saldo := regCli.saldo + monto 
             REGRABAR(ArchClientes, regCli) 
             cant_depositos := cant_depositos + 1
+            
+        ####################
+            regMov.nro_usuario := regCli.nro_usuario
+            regMov.descripcion := "Deposito"
+
+            GRABAR(ArchMovimientos, regMov)
+
             ESC("Depósito exitoso.")
+            ESC("Su saldo actual es: $", regCli.saldo)
+        ####################
+
         Sino
             ESC("Error: Monto inválido.")
         Fin si
     Fin Procedimiento
 
-    Procedimiento Extraer() es
+    Procedimiento Extraer_plata() es
         ESC("Ingrese el monto a extraer:")
         LEER(monto)
+
         SI monto > regCli.limite_extraccion ENTONCES
             ESC("Error: Supera el límite diario de $", regCli.limite_extraccion)
         Sino 
@@ -47,7 +79,17 @@ AMBIENTE
                     regCli.saldo := regCli.saldo - monto
                     REGRABAR(ArchClientes, regCli) 
                     cant_extracciones := cant_extracciones + 1
+
+                    #################
+                    regMov.nro_usuario := regCli.nro_usuario
+                    regMov.descripcion := "Extraccion"
+
+                    GRABAR(ArchMovimientos, regMov)
+
                     ESC("Extracción exitosa. Retire su dinero.")
+                    ESC("Su saldo actual es: $", regCli.saldo)
+                    ################
+
                 Sino
                     ESC("Error: Monto inválido.")
                 Fin si
@@ -55,23 +97,37 @@ AMBIENTE
         Fin si
     Fin Procedimiento
 
-    Procedimiento Transferir() es
+    Procedimiento Transferir_plata() es
         ESC("Ingrese el CBU/Cuenta destino (sólo números):")
         LEER(cuenta_destino)
+
+            //SI cuenta_destino <> 0 ENTONCES //sino ESC("Debe ingresar una cuenta válida.")
         ESC("Ingrese el monto a transferir:")
         LEER(monto)
-        SI monto > regCli.saldo ENTONCES
+
+        SI (//monto > 0 y ) monto > regCli.saldo ENTONCES
             ESC("Error: Saldo insuficiente.")
         Sino 
             SI monto > 0 ENTONCES
                 regCli.saldo := regCli.saldo - monto
                 REGRABAR(ArchClientes, regCli) 
                 cant_transferencias := cant_transferencias + 1
-                ESC("Transferencia exitosa a la cuenta ", cuenta_destino)
+
+                ################
+                    regMov.nro_usuario := regCli.nro_usuario
+                    regMov.descripcion := "Transferencia"
+
+                    GRABAR(ArchMovimientos, regMov)
+
+                    ESC("Transferencia exitosa a la cuenta ", cuenta_destino)
+                    ESC("Su saldo actual es: $", regCli.saldo)
+                ################
+
+              
             Sino
                 ESC("Error: Monto inválido.")
             Fin si
-        Fin si
+        Fin si                // se puede meter algo para ver si la cuenta es válida o no ¿
     Fin Procedimiento
 
     Procedimiento MostrarRegistro() es
@@ -80,6 +136,30 @@ AMBIENTE
         ESC("Extracciones: ", cant_extracciones)
         ESC("Transferencias: ", cant_transferencias)
     Fin Procedimiento
+
+############################
+Procedimiento Mostrar_movimientos() es
+
+        ESC("===MOVIMIENTOS DE LA SESIÓN ===")
+        Abrir E/ (ArchMovimientos)
+        LEER(ArchMovimientos, regMov)
+
+        MIENTRAS NO FDA(ArchMovimientos) HACER
+
+            SI regMov.nro_usuario = regCli.nro_usuario ENTONCES
+                 ESC(regMov.descripcion)
+            Fs
+
+            LEER(ArchMovimientos, regMov)
+
+        FM
+        CERRAR(ArchMovimientos)
+        ESC("Resumen de operaciones:")
+        ESC("Depósitos: ", cant_depositos)
+        ESC("Extracciones: ", cant_extracciones)
+        ESC("Transferencias: ", cant_transferencias)
+    Fp
+
 
 PROCESO
     intentos := 0
@@ -114,24 +194,24 @@ PROCESO
         Fin si
     FIN_MIENTRAS
 
-    SI acceso_concedido = VERDADERO ENTONCES
+    SI acceso_concedido ENTONCES
         REPETIR
             ESC("=== MENÚ PRINCIPAL ===")
             ESC("1. Consultar Saldo")
             ESC("2. Depositar")
             ESC("3. Extraer")
             ESC("4. Transferir")
-            ESC("5. Ver Registro de Operaciones")
+            ESC("5. Ver Registro de Operaciones") // o ver resumen/movimientos
             ESC("6. Salir")
             ESC("Seleccione una opción:")
             LEER(opcion)
 
             SEGUN opcion HACER
                 = 1: ConsultarSaldo()
-                = 2: Depositar()
-                = 3: Extraer()
-                = 4: Transferir()
-                = 5: MostrarRegistro()
+                = 2: Depositar_plata()
+                = 3: Extraer_plata()
+                = 4: Transferir_plata()
+                = 5: MostrarRegistro() //mostrar_movimientos()
                 = 6: ESC("Gracias por operar con nosotros.")
             FIN_SEGUN
 
@@ -145,4 +225,6 @@ PROCESO
     Fin si
 
     CERRAR(ArchClientes)
+    //CERRAR(archmovimientos)
 FACCION
+
