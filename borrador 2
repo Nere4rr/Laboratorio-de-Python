@@ -6,7 +6,7 @@ AMBIENTE
         contraseña: AN(4);
         saldo: numérico;
         nombre: AN(50);
-    Fin Registro; [cite: 2336-2340]
+    Fin Registro; 
 
  
     ArchUsuarios: Archivo de DATOS_USUARIO ordenado por id_usuario; 
