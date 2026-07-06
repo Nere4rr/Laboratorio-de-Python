@@ -1,5 +1,5 @@
-# Trabajo Final Integrador - Laboratorio de Python
-# Simulador de Cajero Automático con Persistencia Total en Archivos
+
+Simulador de Cajero Automático 
 
 def mostrar_menu():
     """Imprime el menú de opciones del cajero."""
