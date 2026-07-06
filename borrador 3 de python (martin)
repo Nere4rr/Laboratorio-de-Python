@@ -1,0 +1,209 @@
+# Trabajo Final Integrador - Laboratorio de Python
+# Simulador de Cajero Automático con Persistencia Total en Archivos
+
+def mostrar_menu():
+    """Imprime el menú de opciones del cajero."""
+    print("\n" + "="*30)
+    print("   CAJERO AUTOMÁTICO")
+    print("="*30)
+    print("1. Consultar Saldo")
+    print("2. Depositar Dinero")
+    print("3. Extraer Dinero")
+    print("4. Transferir Dinero")
+    print("5. Ver Registro de Operaciones")
+    print("6. Salir")
+    print("="*30)
+
+def registrar_operacion(usuario, operacion):
+    """Guarda una operación en el archivo de historial del usuario usando modo 'a'."""
+    nombre_archivo = f"historial_{usuario}.txt"
+    # [span_6](start_span)[span_7](start_span)'with open' garantiza el cierre automático y seguro del archivo[span_6](end_span)[span_7](end_span)
+    with open(nombre_archivo, "a") as archivo:
+        archivo.write(operacion + "\n")
+
+def leer_registro(usuario):
+    """Lee el archivo de historial línea por línea usando modo 'r'."""
+    nombre_archivo = f"historial_{usuario}.txt"
+    print("\n--- Registro de Operaciones ---")
+    
+    try:
+        with open(nombre_archivo, "r") as archivo:
+            # Iteración sobre archivo secuencial línea por línea
+            for idx, linea in enumerate(archivo, start=1):
+                # [span_8](start_span)strip() elimina saltos de línea y espacios extra al mostrar[span_8](end_span)
+                print(f"{idx}. {linea.strip()}")
+    except FileNotFoundError:
+        print("No hay operaciones registradas aún en esta cuenta.")
+    
+    print("-------------------------------")
+
+def cargar_cuentas():
+    """Lee el archivo maestro de saldos. Si no existe, lo inicializa con valores por defecto."""
+    base_datos = {}
+    nombre_archivo = "cuentas.txt"
+    
+    try:
+        with open(nombre_archivo, "r") as archivo:
+            for linea in archivo:
+                # [span_9](start_span)split() divide la línea en palabras/campos independientes[span_9](end_span)
+                datos = linea.strip().split()
+                if len(datos) == 4:
+                    usuario = datos[0]
+                    base_datos[usuario] = {
+                        "contrasena": datos[1],
+                        "saldo": float(datos[2]),
+                        "limite_extraccion": float(datos[3])
+                    }
+    except FileNotFoundError:
+        # [span_10](start_span)[span_11](start_span)Excepción si el archivo no existe[span_10](end_span)[span_11](end_span). Se definen valores iniciales de la cátedra.
+        base_datos = {
+            "admin": {
+                "contrasena": "1234",
+                "saldo": 50000.0,
+                "limite_extraccion": 15000.0
+            },
+            "alumno": {
+                "contrasena": "4321",
+                "saldo": 10000.0,
+                "limite_extraccion": 5000.0
+            }
+        }
+        # [span_12](start_span)Se crea el archivo por primera vez[span_12](end_span)
+        guardar_cuentas(base_datos)
+        
+    return base_datos
+
+def guardar_cuentas(base_datos):
+    """Sobrescribe el archivo maestro con el estado de saldos actualizado usando modo 'w'."""
+    nombre_archivo = "cuentas.txt"
+    # [span_13](start_span)El modo 'w' reemplaza el contenido viejo por el nuevo de forma limpia[span_13](end_span)
+    with open(nombre_archivo, "w") as archivo:
+        for usuario, info in base_datos.items():
+            linea = f"{usuario} {info['contrasena']} {info['saldo']} {info['limite_extraccion']}\n"
+            archivo.write(linea)
+
+def iniciar_sesion(base_datos):
+    """Valida el ingreso del usuario usando un contador de intentos."""
+    intentos_fallidos = 0
+    limite_intentos = 3
+    
+    print("--- INICIO DE SESIÓN ---")
+    while intentos_fallidos < limite_intentos:
+        usuario = input("Ingrese su usuario: ")
+        contrasena = input("Ingrese su contraseña: ")
+        
+        if usuario in base_datos and base_datos[usuario]["contrasena"] == contrasena:
+            print(f"\n¡Bienvenido/a al sistema, {usuario}!")
+            return usuario
+        else:
+            intentos_fallidos += 1
+            intentos_restantes = limite_intentos - intentos_fallidos
+            print(f"Error: Credenciales incorrectas. Le quedan {intentos_restantes} intentos.")
+            
+    print("Acceso bloqueado por seguridad tras superar el límite de intentos.")
+    return None
+
+def main():
+    # Carga inicial de datos desde el archivo de texto persistente
+    usuarios = cargar_cuentas()
+
+    usuario_actual = iniciar_sesion(usuarios)
+    if usuario_actual is None:
+        return 
+
+    cuenta = usuarios[usuario_actual]
+    bandera_salir = False
+
+    while not bandera_salir:
+        mostrar_menu()
+        
+        try:
+            opcion = int(input("Seleccione una operación (1-6): "))
+        except ValueError:
+            print("Error: Por favor, ingrese un número entero válido.")
+            continue
+            
+        if opcion == 1:
+            # 1. Consulta de saldo
+            print(f"\nSu saldo actual es: ${cuenta['saldo']:.2f}")
+            registrar_operacion(usuario_actual, "Consulta de saldo")
+            
+        elif opcion == 2:
+            # 2. Depósito
+            try:
+                monto = float(input("\nIngrese el monto a depositar: $"))
+                if monto > 0:
+                    cuenta["saldo"] += monto 
+                    # Persistencia inmediata del saldo en el archivo maestro
+                    guardar_cuentas(usuarios)
+                    print(f"Depósito exitoso. Su nuevo saldo es: ${cuenta['saldo']:.2f}")
+                    registrar_operacion(usuario_actual, f"Depósito: +${monto:.2f}")
+                else:
+                    print("Error: El monto a depositar debe ser mayor a 0.")
+            except ValueError:
+                print("Error: Tipo de dato inválido. Ingrese valores numéricos.")
+                
+        elif opcion == 3:
+            # 3. Extracción
+            try:
+                monto = float(input("\nIngrese el monto a extraer: $"))
+                
+                if monto <= 0:
+                    print("Error: El monto a extraer debe ser mayor a 0.")
+                elif monto > cuenta["limite_extraccion"]:
+                    print(f"Error: El monto supera su límite de extracción (${cuenta['limite_extraccion']:.2f}).")
+                elif monto > cuenta["saldo"]:
+                    print("Error: Control de saldo insuficiente.")
+                else:
+                    cuenta["saldo"] -= monto 
+                    # Persistencia inmediata del saldo en el archivo maestro
+                    guardar_cuentas(usuarios)
+                    print(f"Extracción exitosa. Por favor, retire su dinero.")
+                    print(f"Su nuevo saldo es: ${cuenta['saldo']:.2f}")
+                    registrar_operacion(usuario_actual, f"Extracción: -${monto:.2f}")
+            except ValueError:
+                print("Error: Tipo de dato inválido.")
+                
+        elif opcion == 4:
+            # 4. Transferencias
+            destinatario = input("\nIngrese el usuario de destino: ")
+            
+            if destinatario in usuarios and destinatario != usuario_actual:
+                try:
+                    monto = float(input("Ingrese el monto a transferir: $"))
+                    
+                    if monto <= 0:
+                        print("Error: El monto debe ser mayor a 0.")
+                    elif monto > cuenta["saldo"]:
+                        print("Error: Saldo insuficiente para realizar la transferencia.")
+                    else:
+                        # Actualización de acumuladores en memoria
+                        cuenta["saldo"] -= monto
+                        usuarios[destinatario]["saldo"] += monto
+                        
+                        # Guardado de ambos saldos modificados en el archivo maestro
+                        guardar_cuentas(usuarios)
+                        print(f"Transferencia de ${monto:.2f} a '{destinatario}' realizada con éxito.")
+                        
+                        # Registro en archivos individuales de historial
+                        registrar_operacion(usuario_actual, f"Transferencia enviada a {destinatario}: -${monto:.2f}")
+                        registrar_operacion(destinatario, f"Transferencia recibida de {usuario_actual}: +${monto:.2f}")
+                except ValueError:
+                    print("Error: Tipo de dato inválido.")
+            else:
+                print("Error: El usuario de destino no existe o es inválido.")
+                
+        elif opcion == 5:
+            # 5. Registro de operaciones
+            leer_registro(usuario_actual)
+            
+        elif opcion == 6:
+            # 6. Salir
+            print("\nGracias por utilizar el Cajero Automático. Retirando tarjeta...")
+            bandera_salir = True
+            
+        else:
+            print("\nError: Opción no válida. Ingrese un número del 1 al 6.")
+
+if __name__ == "__main__":
+    main()
