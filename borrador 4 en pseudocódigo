@@ -1,0 +1,179 @@
+ACCION SIMULADOR_CAJERO ES
+AMBIENTE
+    REG_CLIENTE = REGISTRO
+        NRO_USUARIO: AN(20);
+        CONTRASENA: AN(20);
+        SALDO: real;
+        LIMITE_EXTRACCION: real;
+    FINREGISTRO
+
+    ARCH_CUENTAS: Archivo de REG_CLIENTE;
+    REG_CUENTA: REG_CLIENTE;
+    
+    ARCH_HISTORIAL: Archivo de texto;
+
+    tabla_cuentas: Arreglo [1..100] de REG_CLIENTE;
+    cant_cuentas: entero;
+    
+    usu_ingreso, pin_ingreso, destinatario: AN(20);
+    monto: real;
+    intentos, opcion, c_dep, c_ext, c_tra, pos_actual, pos_destino, i: entero;
+    acceso_concedido, bandera_salir: logico;
+
+PROCESO
+    cant_cuentas := 0;
+    
+    // --- CARGA DE DATOS A MEMORIA ---
+    ABRIR E/(ARCH_CUENTAS); 
+    LEER(ARCH_CUENTAS, REG_CUENTA);
+    
+    MIENTRAS NFDA(ARCH_CUENTAS) HACER
+        cant_cuentas := cant_cuentas + 1;
+        tabla_cuentas[cant_cuentas] := REG_CUENTA;
+        LEER(ARCH_CUENTAS, REG_CUENTA);
+    FINMIENTRAS
+    CERRAR(ARCH_CUENTAS);
+    
+    intentos := 0;
+    acceso_concedido := Falso;
+    pos_actual := 0;
+    
+    // --- INICIO DE SESION ---
+    ESC("--- INICIO DE SESION ---");
+    MIENTRAS (intentos < 3) Y (acceso_concedido = Falso) HACER
+        ESC("Ingrese su usuario: ");
+        LEER(usu_ingreso);
+        ESC("Ingrese su contrasena: ");
+        LEER(pin_ingreso);
+        
+        // Busqueda del usuario en el arreglo
+        pos_actual := 0;
+        PARA i := 1 HASTA cant_cuentas HACER
+            SI tabla_cuentas[i].NRO_USUARIO = usu_ingreso ENTONCES
+                pos_actual := i;
+            FINSI
+        FINPARA
+        
+        SI (pos_actual > 0) Y (tabla_cuentas[pos_actual].CONTRASENA = pin_ingreso) ENTONCES
+            acceso_concedido := Verdadero;
+            ESC("Bienvenido/a al sistema, ", usu_ingreso);
+        SINO
+            intentos := intentos + 1;
+            ESC("Datos incorrectos. Intentos restantes: ", 3 - intentos);
+        FINSI
+    FINMIENTRAS
+
+    // --- MENU DE OPERACIONES ---
+    SI acceso_concedido = Falso ENTONCES
+        ESC("Cuenta bloqueada por seguridad.");
+    SINO
+        c_dep := 0;
+        c_ext := 0;
+        c_tra := 0;
+        bandera_salir := Falso;
+        
+        MIENTRAS bandera_salir = Falso HACER
+            ESC("1. Saldo | 2. Depositar | 3. Extraer | 4. Transferir | 5. Salir");
+            LEER(opcion);
+            
+            // Alternativas anidadas con SINO
+            SI opcion = 1 ENTONCES
+                ESC("Su saldo es: $", tabla_cuentas[pos_actual].SALDO);
+                ABRIR /S(ARCH_HISTORIAL);
+                ESC(ARCH_HISTORIAL, "Consulta de saldo");
+                CERRAR(ARCH_HISTORIAL);
+            SINO
+                SI opcion = 2 ENTONCES
+                    ESC("Monto a depositar: ");
+                    LEER(monto);
+                    SI monto > 0 ENTONCES
+                        tabla_cuentas[pos_actual].SALDO := tabla_cuentas[pos_actual].SALDO + monto;
+                        c_dep := c_dep + 1;
+                        ESC("Deposito exitoso. Nuevo saldo: $", tabla_cuentas[pos_actual].SALDO);
+                        
+                        ABRIR /S(ARCH_CUENTAS);
+                        PARA i := 1 HASTA cant_cuentas HACER
+                            ESC(ARCH_CUENTAS, tabla_cuentas[i]);
+                        FINPARA
+                        CERRAR(ARCH_CUENTAS);
+                    SINO
+                        ESC("Error: El monto debe ser mayor a 0.");
+                    FINSI
+                SINO
+                    SI opcion = 3 ENTONCES
+                        ESC("Monto a extraer: ");
+                        LEER(monto);
+                        SI monto <= 0 ENTONCES
+                            ESC("Error: El monto debe ser mayor a 0.");
+                        SINO 
+                            SI monto > tabla_cuentas[pos_actual].LIMITE_EXTRACCION ENTONCES
+                                ESC("Error: Supera su limite de extraccion.");
+                            SINO 
+                                SI monto > tabla_cuentas[pos_actual].SALDO ENTONCES
+                                    ESC("Error: Saldo insuficiente.");
+                                SINO
+                                    tabla_cuentas[pos_actual].SALDO := tabla_cuentas[pos_actual].SALDO - monto;
+                                    c_ext := c_ext + 1;
+                                    ESC("Extraccion exitosa. Nuevo saldo: $", tabla_cuentas[pos_actual].SALDO);
+                                    
+                                    ABRIR /S(ARCH_CUENTAS);
+                                    PARA i := 1 HASTA cant_cuentas HACER
+                                        ESC(ARCH_CUENTAS, tabla_cuentas[i]);
+                                    FINPARA
+                                    CERRAR(ARCH_CUENTAS);
+                                FINSI
+                            FINSI
+                        FINSI
+                    SINO
+                        SI opcion = 4 ENTONCES
+                            ESC("Usuario destino: ");
+                            LEER(destinatario);
+                            
+                            pos_destino := 0;
+                            PARA i := 1 HASTA cant_cuentas HACER
+                                SI tabla_cuentas[i].NRO_USUARIO = destinatario ENTONCES
+                                    pos_destino := i;
+                                FINSI
+                            FINPARA
+                            
+                            SI (pos_destino > 0) Y (destinatario <> usu_ingreso) ENTONCES
+                                ESC("Monto a transferir: ");
+                                LEER(monto);
+                                SI monto <= 0 ENTONCES
+                                    ESC("Error: El monto debe ser mayor a 0.");
+                                SINO 
+                                    SI monto > tabla_cuentas[pos_actual].SALDO ENTONCES
+                                        ESC("Error: Saldo insuficiente.");
+                                    SINO
+                                        tabla_cuentas[pos_actual].SALDO := tabla_cuentas[pos_actual].SALDO - monto;
+                                        tabla_cuentas[pos_destino].SALDO := tabla_cuentas[pos_destino].SALDO + monto;
+                                        c_tra := c_tra + 1;
+                                        ESC("Transferencia exitosa a ", destinatario);
+                                        
+                                        ABRIR /S(ARCH_CUENTAS);
+                                        PARA i := 1 HASTA cant_cuentas HACER
+                                            ESC(ARCH_CUENTAS, tabla_cuentas[i]);
+                                        FINPARA
+                                        CERRAR(ARCH_CUENTAS);
+                                    FINSI
+                                FINSI
+                            SINO
+                                ESC("Error: Usuario destino invalido.");
+                            FINSI
+                        SINO
+                            SI opcion = 5 ENTONCES
+                                bandera_salir := Verdadero;
+                                ESC("--- RESUMEN DE SESION ---");
+                                ESC("Depositos: ", c_dep);
+                                ESC("Extracciones: ", c_ext);
+                                ESC("Transferencias: ", c_tra);
+                            SINO
+                                ESC("Opcion invalida.");
+                            FINSI
+                        FINSI
+                    FINSI
+                FINSI
+            FINSI
+        FINMIENTRAS
+    FINSI
+FINACCION
