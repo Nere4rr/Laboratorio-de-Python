@@ -1,0 +1,185 @@
+import os
+from dataclasses import dataclass
+
+# 1. Definición del Registro
+@dataclass
+class RegCliente:
+    nro_usuario: str
+    contrasena: str
+    saldo: float
+    limite_extraccion: float
+
+# --- FUNCIONES DE ARCHIVOS ---
+
+def cargar_cuentas():
+    """Lee el archivo maestro secuencial y retorna un diccionario de Registros."""
+    base_datos = {}
+    try:
+        with open("cuentas.txt", "r") as archivo:
+            for linea in archivo:
+                datos = linea.strip().split()
+                if len(datos) == 4:
+                    # Instanciamos el Registro
+                    cliente = RegCliente(datos[0], datos[1], float(datos[2]), float(datos[3]))
+                    base_datos[cliente.nro_usuario] = cliente
+    except FileNotFoundError:
+        # Carga por defecto si el archivo no existe
+        base_datos["admin"] = RegCliente("admin", "1234", 50000.0, 15000.0)
+        base_datos["alumno"] = RegCliente("alumno", "4321", 10000.0, 5000.0)
+        guardar_cuentas(base_datos)
+    return base_datos
+
+def guardar_cuentas(base_datos):
+    """Sobrescribe el archivo maestro con los datos actuales."""
+    with open("cuentas.txt", "w") as archivo:
+        for usuario, cliente in base_datos.items():
+            linea = f"{cliente.nro_usuario} {cliente.contrasena} {cliente.saldo} {cliente.limite_extraccion}\n"
+            archivo.write(linea)
+
+def registrar_historial(usuario, operacion):
+    """Guarda operaciones individuales en modo 'a' (agregar)."""
+    with open(f"historial_{usuario}.txt", "a") as archivo:
+        archivo.write(operacion + "\n")
+
+# --- FUNCIONES DE OPERACIONES MODULARIZADAS ---
+
+def realizar_deposito(cliente):
+    """Maneja la lógica de depósito y retorna 1 si fue exitoso (para el contador)."""
+    try:
+        monto = float(input("\nIngrese el monto a depositar: $"))
+        if monto > 0:
+            cliente.saldo += monto
+            print(f"Depósito exitoso. Su nuevo saldo es: ${cliente.saldo:.2f}")
+            registrar_historial(cliente.nro_usuario, f"Depósito: +${monto:.2f}")
+            return 1
+        else:
+            print("Error: El monto a depositar debe ser mayor a 0.")
+    except ValueError:
+        print("Error: Tipo de dato inválido.")
+    return 0
+
+def realizar_extraccion(cliente):
+    """Maneja la extracción validando límites y saldo."""
+    try:
+        monto = float(input("\nIngrese el monto a extraer: $"))
+        if monto <= 0:
+            print("Error: El monto a extraer debe ser mayor a 0.")
+        elif monto > cliente.limite_extraccion:
+            print(f"Error: Supera su límite de extracción (${cliente.limite_extraccion:.2f}).")
+        elif monto > cliente.saldo:
+            print("Error: Saldo insuficiente.")
+        else:
+            cliente.saldo -= monto
+            print(f"Extracción exitosa. Su nuevo saldo es: ${cliente.saldo:.2f}")
+            registrar_historial(cliente.nro_usuario, f"Extracción: -${monto:.2f}")
+            return 1
+    except ValueError:
+        print("Error: Tipo de dato inválido.")
+    return 0
+
+def realizar_transferencia(cliente_origen, base_datos):
+    """Maneja transferencias entre cuentas existentes."""
+    destinatario = input("\nIngrese el usuario destino: ")
+    if destinatario in base_datos and destinatario != cliente_origen.nro_usuario:
+        try:
+            monto = float(input("Ingrese el monto a transferir: $"))
+            if monto <= 0:
+                print("Error: El monto debe ser mayor a 0.")
+            elif monto > cliente_origen.saldo:
+                print("Error: Saldo insuficiente.")
+            else:
+                cliente_destino = base_datos[destinatario]
+                cliente_origen.saldo -= monto
+                cliente_destino.saldo += monto
+                
+                print(f"Transferencia de ${monto:.2f} a '{destinatario}' exitosa.")
+                registrar_historial(cliente_origen.nro_usuario, f"Transf. enviada a {destinatario}: -${monto:.2f}")
+                registrar_historial(destinatario, f"Transf. recibida de {cliente_origen.nro_usuario}: +${monto:.2f}")
+                return 1
+        except ValueError:
+            print("Error: Tipo de dato inválido.")
+    else:
+        print("Error: Usuario destino inválido o inexistente.")
+    return 0
+
+# --- PROGRAMA PRINCIPAL ---
+
+def main():
+    base_datos = cargar_cuentas()
+    
+    # Login
+    intentos = 0
+    cliente_actual = None
+    
+    print("--- INICIO DE SESIÓN ---")
+    while intentos < 3 and cliente_actual is None:
+        usu_ingreso = input("Usuario: ")
+        pin_ingreso = input("Contraseña: ")
+        
+        if usu_ingreso in base_datos and base_datos[usu_ingreso].contrasena == pin_ingreso:
+            cliente_actual = base_datos[usu_ingreso]
+            print(f"\n¡Bienvenido/a, {cliente_actual.nro_usuario}!")
+        else:
+            intentos += 1
+            print(f"Datos incorrectos. Intentos restantes: {3 - intentos}")
+            
+    if cliente_actual is None:
+        print("\nCuenta bloqueada por seguridad.")
+        return
+
+    # Contadores de la sesión
+    c_dep = c_ext = c_tra = 0
+    opcion = 0
+    
+    while opcion != 6:
+        print("\n--- MENÚ CAJERO AUTOMÁTICO ---")
+        print("1. Consultar saldo")
+        print("2. Depositar dinero")
+        print("3. Extraer dinero")
+        print("4. Transferir dinero")
+        print("5. Ver Registro de Operaciones")
+        print("6. Salir")
+        
+        try:
+            opcion = int(input("Seleccione una opción: "))
+            
+            if opcion == 1:
+                print(f"\nSu saldo actual es: ${cliente_actual.saldo:.2f}")
+                registrar_historial(cliente_actual.nro_usuario, "Consulta de saldo")
+                
+            elif opcion == 2:
+                c_dep += realizar_deposito(cliente_actual)
+                guardar_cuentas(base_datos)
+                
+            elif opcion == 3:
+                c_ext += realizar_extraccion(cliente_actual)
+                guardar_cuentas(base_datos)
+                
+            elif opcion == 4:
+                c_tra += realizar_transferencia(cliente_actual, base_datos)
+                guardar_cuentas(base_datos)
+                
+            elif opcion == 5:
+                print("\n--- HISTORIAL ---")
+                try:
+                    with open(f"historial_{cliente_actual.nro_usuario}.txt", "r") as f:
+                        for i, linea in enumerate(f, 1):
+                            print(f"{i}. {linea.strip()}")
+                except FileNotFoundError:
+                    print("No hay movimientos registrados.")
+                    
+            elif opcion == 6:
+                print("\nSaliendo del sistema...")
+                print("--- RESUMEN DE SESIÓN ---")
+                print(f"Depósitos realizados: {c_dep}")
+                print(f"Extracciones realizadas: {c_ext}")
+                print(f"Transferencias realizadas: {c_tra}")
+                print("¡Gracias por utilizar el servicio!")
+            else:
+                print("Opción inválida.")
+                
+        except ValueError:
+            print("Error: Ingrese un número válido.")
+
+if __name__ == "__main__":
+    main()
