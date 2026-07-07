@@ -1,0 +1,123 @@
+ACCION CajeroAutomatico ES
+AMBIENTE
+   
+    Datos_Usuario = Registro
+        id_usuario: AN(10)
+        contraseña: AN(4)
+        saldo: N(10)
+        nombre: AN(50)
+    Fin Registro; 
+ 
+    ArchUsu: Archivo de Datos_Usuario ordenado por id_usuario
+    RegUsuario: Datos_Usuario
+
+    monto: numérico
+    usuario_ingresado, Contra_ingresada: alfanumérico
+    opcion, intentos, cant_operaciones: entero
+    sesion_valida, usu_encontrado: logico
+
+    Procedimiento Archivo_Prueba() Es
+        Si No ExisteArchivo(ArchUsu) Entonces
+            reg.usuario := "admin"
+            reg.clave := 1234
+            reg.saldo := 50000.00
+            reg.nombre := "Administrador"
+            GRABAR(ArchUsu, RegUsuario)
+
+            reg.usuario := "user1"
+            reg.clave := 0000
+            reg.saldo := 15000.00
+            reg.nombre := "Usuario Prueba"
+            GRABAR(ArchUsu, RegUsuario)
+        Fin si
+    Fin Procedimiento
+
+PROCESO
+    Abrir E/(ArchUsu)
+    Leer(ArchUsu, RegUsuario) 
+    
+    intentos := 0
+    cant_operaciones := 0
+    sesion_valida := F
+
+    Esc("Bienvenido al Sistema de Cajero Automático")
+
+    Repetir
+        Esc("Ingrese su identificador de usuario:")
+        Leer(usuario_ingresado)
+        Esc("Ingrese su contraseña:")
+        Leer(Contra_ingresada)
+
+        usu_encontrado := F
+        
+        Mientras NFDA(ArchUsu) y (usu_encontrado = F) hacer 
+            Si (RegUsuario.id_usuario = usuario_ingresado) y (RegUsuario.contraseña = Contra_ingresada) Entonces 
+                usu_encontrado := V
+                sesion_valida := V
+            Sino
+                Leer(ArchUsu, RegUsuario) 
+            Fin si
+        Fin Mientras
+
+        Si NO sesion_valida Entonces
+            intentos := intentos + 1
+            Esc("Usuario o clave incorrectos. Intentos restantes: ", 3 - intentos)
+        FIN SI
+    Hasta que (sesion_valida = V) O (intentos = 3)
+
+    
+    Si (sesion_valida = V) Entonces
+        
+        Esc("Acceso autorizado. Bienvenido/a al sistema, ", RegUsuario.nombre) 
+        
+        Repetir
+            Esc("--- MENÚ PRINCIPAL ---")
+            Esc("1. Consultar saldo")
+            Esc("2. Depositar dinero")
+            Esc("3. Extraer dinero")
+            Esc("4. Transferir dinero")
+            Esc("5. Ver registro de operaciones")
+            Esc("6. Salir")
+            Leer(opcion)
+
+            Segun opcion Hacer
+                1:  Esc("Su saldo actual es de: $", RegUsuario.saldo) 
+                    cant_operaciones := cant_operaciones + 1
+
+                2:  Esc("Ingrese el monto a depositar:")
+                    Leer(monto)
+                    Si monto > 0 Entonces
+                        Saldo:= Saldo + monto
+                        Esc("Depósito realizado correctamente.")
+                        cant_operaciones:= cant_operaciones + 1
+                    Sino
+                        Esc("Error: Monto ingresado invalido")
+                    Fin si
+
+                3:  Esc("Ingrese el monto a extraer:")
+                    Leer(monto)
+                     
+                    Si monto > RegUsuario.saldo Entonces
+                        Esc("Error: Fondos insuficientes.")
+                    Sino        
+                        RegUsuario.saldo := RegUsuario.saldo - monto 
+                        Esc("Extracción realizada con éxito. Retire su dinero.")
+                        cant_operaciones := cant_operaciones + 1
+                    Fin Si
+                4:  
+
+                5:  Esc("Cantidad de operaciones exitosas en esta sesión: ", cant_operaciones)
+
+                6:  Esc("Cerrando sesión de manera segura...")
+                Otros:
+                    Esc("Error: Opción no válida.")
+            Fin Segun
+        Hasta que opcion = 3
+        
+        Esc("Cantidad de operaciones exitosas en esta sesión: ", cant_operaciones)
+    Sino
+        Esc("Cajero bloqueado temporalmente por seguridad.")
+    Fin Si
+
+    Cerrar(ArchUsu)
+Fin Accion
