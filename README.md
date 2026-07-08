@@ -115,9 +115,19 @@ El menú disponible es el siguiente:
 
 🔶Si el usuario ingresa la “opción 6” Mostrará la cantidad de operaciones realizadas, finalizando la sesión.
 
+⭐ Ejecutar el programa ⭐
 
+1. Entrar al repositorio en GitHub.
+2. Hacer clic en el botón verde "Code".
+3. Ir a la pestaña "Codespaces".
+4. Hacer clic en "Create codespace on main".
+5. Esperar a que se abra un editor (tipo VS Code) en el navegador, con una terminal integrada.
+6. En la terminal, escribir:
 
+       python cajero_automatico.py
 
+7. Darle a enter una vez terminado de escribir en la terminal.
+   
 ⭐ Uso de la Inteligencia Artificial⭐
 
 En general, utilizamos la inteligencia artificial (Code copilot)  para corroborar si algunas partes del código estaban correctamente definidas.
