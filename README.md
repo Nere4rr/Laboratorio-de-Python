@@ -107,6 +107,7 @@ Una vez logueado en el programa, se desplegará un menú. Donde el usuario puede
             🔸Una vez llegado a $20.000 en extracción, no dejará que el usuario realice más extracciones.
 
 🔶Si el usuario ingresa la “opción 4”:
+
             🔸Se pedirá al usuario que ingrese la cuenta destino a la que quiere enviar el dinero (esta debe ser el otro usuario de prueba disponible, ej.: si ingresó con “admin”, el usuario destino deberá ser “alumno”)
             🔸Si se ingresa un usuario no válido, saltará un error y se enviará nuevamente al menú principal.
             🔸Si el usuario es válido, el simulador pide el monto que se quiera enviar.
