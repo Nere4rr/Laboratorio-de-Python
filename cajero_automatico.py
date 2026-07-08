@@ -2,8 +2,12 @@ import os
 
 arch_usu = "usuarios.txt" # nombre del archivo donde se guardan los datos de los usuarios
 
+limite_ext = 10000   # máximo permitido por operación
+limite_diario = 20000           # máximo acumulado de extracciones en la sesión
+
+
 def prueba():
- # escribe dos usuarios de prueba (admin y alumno), con formato: "usuario; clave; saldo; nombre"
+ # escribe dos usuarios de prueba adentro (admin y alumno), con formato: "usuario; clave; saldo; nombre"
 
     archivo = open(arch_usu, "w", encoding="utf-8")
 
@@ -69,6 +73,7 @@ def actualizar(usu_modif):
     archivo.close()
 
 
+
 def obtiene_usu(usuario): 
 
     # Busca el usuario solo por id, sin verificar contraseña. Se usa para ver que exista el destino de la transferencia
@@ -95,7 +100,7 @@ def obtiene_usu(usuario):
 
 def cajero_automatico():
 
-    # Permite hasta 3 intentos de login. Si acierta, guarda los datos del usuario y continúa; si falla 3 veces, bloquea el acceso
+    # Permite hasta 3 intentos de login. Si acierta, guarda los datos del usuario y continúa. Si falla 3 veces, bloquea el acceso
 
     prueba()
 
@@ -103,6 +108,8 @@ def cajero_automatico():
     cont_op = 0     # cantidad de operaciones realizadas en la sesión
 
     operaciones = ""    # historial de operaciones de la sesión
+
+    cont_ext = 0   # acumula lo extraído en la sesión para controlar el límite diario
 
     sesion_valida = False
 
@@ -147,7 +154,7 @@ def cajero_automatico():
 
         id_usuario, contra, saldo, nombre = usu_actual.split(";")
 
-        saldo = float(saldo) # convierte el saldo de texto a número
+        saldo = float(saldo) # convierte el saldo de texto a número 
 
 
         print(f"\nAcceso autorizado. Bienvenido/a {nombre}")
@@ -182,7 +189,7 @@ def cajero_automatico():
 
             elif opcion == 2:
 
-                # pide un monto, si es mayor a 0 lo suma al saldo y lo anota, si no, avisa erro
+                # pide un monto, si es mayor a 0 lo suma al saldo y lo anota, si no, avisa error
 
                 monto = float(input("Ingrese el monto a depositar: "))
 
@@ -203,7 +210,6 @@ def cajero_automatico():
 
                 # pide un monto, verifica que no sea mayor al saldo ni menor/igual a 0, si está todo bien lo resta del saldo
 
-
                 monto = float(input("Ingrese el monto a extraer: "))
                    
 
@@ -213,9 +219,23 @@ def cajero_automatico():
                 elif monto <= 0:
 
                     print("El monto debe ser mayor a cero.")
+
+                elif monto > limite_ext:
+
+                    # no se puede extraer más del límite de extracción en una sola operación
+                    print(f"Error: no se pueden extraer más de ${limite_ext} por operación.")
+
+                elif cont_ext + monto > limite_diario:
+
+                    # no se puede superar el límite diario en la sesión
+                    disponible = limite_diario - cont_ext
+                    print(f"Error: se superó el límite diario de extracción. Disponible para extraer hoy: ${disponible:.2f}")
+
                 else:
 
                     saldo -= monto
+
+                    cont_ext += monto   # actualiza lo extraído en la sesión
 
                     operaciones += (f"Extracción realizada: ${monto:.2f}\n")
                         
@@ -264,10 +284,9 @@ def cajero_automatico():
                         saldo_dest += monto 
 
                         
-
-                        actualizar
                         # guarda los cambios del usuario destino 
-                        (
+
+                        actualizar(
                             id_dest + ";" +
                             con_dest + ";" +
                             str(saldo_dest) + ";" +
@@ -282,9 +301,8 @@ def cajero_automatico():
 
                         print("Transferencia realizada correctamente.")
 
-            elif opcion == 5:
-
-               # muestra todas las operaciones hechas en esta sesión
+            elif opcion == 5: # muestra el historial de opercaiones de la sesión
+               
 
                 print("\n--- REGISTRO DE OPERACIONES ---")      
 
@@ -302,17 +320,15 @@ def cajero_automatico():
 
             else:
 
-                print("Error: Opción no válida.") # cualquier opcion cosa no es válida
+                print("Error: Opción no válida.") # cualquier opción diferente no es válida
 
-        actualizar
         # guarda los cambios del usuario actual
-        (
+        actualizar(
             id_usuario + ";" +
             contra + ";" +
             str(saldo) + ";" +
             nombre
         )
-
 
         print( f"\nCantidad de operaciones realizadas en esta sesión: {cont_op}") # muestra cuántas operaciones se hicieron en la sesión
 
