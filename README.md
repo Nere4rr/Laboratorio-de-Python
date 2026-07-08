@@ -119,7 +119,9 @@ El menú disponible es el siguiente:
 🔶Si el usuario ingresa la “opción 4”:
 
             🔸Se pedirá al usuario que ingrese la cuenta destino a la que quiere enviar el dinero (esta debe ser el otro usuario de prueba disponible, ej.: si ingresó con “admin”, el usuario destino deberá ser “alumno”)
+			
             🔸Si se ingresa un usuario no válido, saltará un error y se enviará nuevamente al menú principal.
+			
             🔸Si el usuario es válido, el simulador pide el monto que se quiera enviar.
 
 🔶Si el usuario ingresa la “opción 5” se mostrará un historial de las operaciones realizadas durante la sesión. 
@@ -129,14 +131,14 @@ El menú disponible es el siguiente:
    
 ⭐ Uso de la Inteligencia Artificial⭐
 
-En general, utilizamos la inteligencia artificial (Code copilot)  para corroborar si algunas partes del código estaban correctamente definidas.
+*En general, utilizamos la inteligencia artificial (Code copilot) para corroborar si algunas partes del código estaban correctamente definidas.
 🟡Ej.: En el tratamiento del archivo y registro
 
 	archivo = open(arch_usu, "w", encoding="utf-8")
-  	  archivo.write("admin;1234;50000;Administrador\n")
+  	 	archivo.write("admin;1234;50000;Administrador\n")
     	archivo.write("alumno;0000;15000;Usuario Prueba\n")
 	archivo.close()
 
-La utilizamos para poder hacer pruebas de escritorio en el pseudocódigo desarrollado como borrador.
-Para corregir errores de sintaxis, como en la definición de archivos o los bucles.
+*La utilizamos para poder hacer pruebas de escritorio en el pseudocódigo desarrollado como borrador.
+*Para corregir errores de sintaxis, como en la definición de archivos o los bucles.
 
