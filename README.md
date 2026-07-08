@@ -74,6 +74,7 @@ Una vez ejecutado el programa se le pedirá al usuario ingresar “Nombre de usu
 
 	Nombre: admin
 	Contraseña: 1234
+	////////////////
 	Nombre: alumno
 	Contraseña: 0000
 
