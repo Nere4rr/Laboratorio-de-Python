@@ -8,9 +8,13 @@ Repositorio del grupo C 35. Aquí encontrará el desarrollo del taller de Python
 - GONZALEZ, Irina 
 - VALUSSI MELENDES, Fabrizio Francisco
 
+
+
 ⭐¿Qué se encuentra en este repositorio?⭐
 
 En este repositorio se encuentra un simulador del funcionamiento básico de un cajero automático, desarrollado en Python, que permite a un usuario predefinido autenticarse y realizar operaciones bancarias simples como consultar saldo, depositar, extraer y transferir dinero. Además se encuentra un video explicativo del sistema en cuestión.
+
+
 
 ⭐Función general del sistema⭐
 
@@ -22,12 +26,16 @@ Primero, pide al usuario la autenticación para ingresar a la cuenta, permite ha
  5. Ver registro de operaciones de la sesión realizados durante la sesión actual
  6. Salir del sistema, guardando los cambios en el saldo
 
+
+
 ⭐ERRORES QUE PUEDEN SURGIR EN LA EJECUCIÓN DEL PROGRAMA⭐
 
 * No permite depositar o extraer montos negativos o cero.
 * No permite extraer más dinero del que hay disponible.
 * No permite transferir a un usuario que no existe.
 * Maneja errores si el usuario ingresa texto en vez de números en el menú.
+
+
 
 ⭐ Estructuras utilizadas en el desarrollo del código:⭐
 
@@ -52,6 +60,8 @@ archivo = open(arch_usu, "w", encoding="utf-8")
     archivo.write("admin;1234;50000;Administrador\n")
     archivo.write("alumno;0000;15000;Usuario Prueba\n")
 archivo.close()
+
+
 
 
 ⭐ Instrucciones de ejecución del programa ⭐
@@ -93,6 +103,8 @@ Una vez logueado en el programa, se desplegará un menú. Donde el usuario puede
 🔶Si el usuario ingresa la “opción 5” se mostrará un historial de las operaciones realizadas durante la sesión. 
 
 🔶Si el usuario ingresa la “opción 6” Mostrará la cantidad de operaciones realizadas, finalizando la sesión.
+
+
 
 
 ⭐ Uso de la Inteligencia Artificial⭐
