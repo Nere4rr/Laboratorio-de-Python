@@ -9,9 +9,11 @@ Repositorio del grupo C 35. Aquí encontrará el desarrollo del taller de Python
 - VALUSSI MELENDES, Fabrizio Francisco
 
 ⭐¿Qué se encuentra en este repositorio?⭐
+
 En este repositorio se encuentra un simulador del funcionamiento básico de un cajero automático, desarrollado en Python, que permite a un usuario predefinido autenticarse y realizar operaciones bancarias simples como consultar saldo, depositar, extraer y transferir dinero. Además se encuentra un video explicativo del sistema en cuestión.
 
 ⭐Función general del sistema⭐
+
 Primero, pide al usuario la autenticación para ingresar a la cuenta, permite hasta 3 intentos; si falla las 3 veces, bloquea el acceso (para esa ejecución del programa). Una vez verificada la sesión, ingresa y genera un menú de opciones.
  1. Consultar el saldo disponible.
  2. Depositar dinero en la cuenta actual
@@ -21,12 +23,14 @@ Primero, pide al usuario la autenticación para ingresar a la cuenta, permite ha
  6. Salir del sistema, guardando los cambios en el saldo
 
 ⭐ERRORES QUE PUEDEN SURGIR EN LA EJECUCIÓN DEL PROGRAMA⭐
+
 * No permite depositar o extraer montos negativos o cero.
 * No permite extraer más dinero del que hay disponible.
 * No permite transferir a un usuario que no existe.
 * Maneja errores si el usuario ingresa texto en vez de números en el menú.
 
 ⭐ Estructuras utilizadas en el desarrollo del código:⭐
+
 🟢 Condicionales (If, Elif, Else)
 if opcion == 1:
 …
@@ -51,6 +55,7 @@ archivo.close()
 
 
 ⭐ Instrucciones de ejecución del programa ⭐
+
 Una vez ejecutado el programa se le pedirá al usuario ingresar “Nombre de usuario” y “contraseña”. Existen dos usuarios de prueba disponibles para el simulador:
 Nombre: admin
 Contraseña: 1234
@@ -91,6 +96,7 @@ Una vez logueado en el programa, se desplegará un menú. Donde el usuario puede
 
 
 ⭐ Uso de la Inteligencia Artificial⭐
+
 En general, utilizamos la inteligencia artificial (Code copilot)  para corroborar si algunas partes del código estaban correctamente definidas.
 🟡Ej.: En el tratamiento del archivo y registro
  
