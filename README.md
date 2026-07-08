@@ -99,9 +99,11 @@ Una vez logueado en el programa, se desplegará un menú. Donde el usuario puede
 🔶Si el usuario ingresa la “opción 2” el programa pedirá que ingrese un monto de dinero para depositar en la cuenta.
 
 🔶Si el usuario ingresa la “opción 3” el programa pedirá al usuario que ingrese un monto a retirar. Existe un monto máximo a retirar por cada operación ($10.000) y por cada uso del programa/sesión ($20.000):
-            
+
 			🔸En el caso que el usuario desee retirar un monto superior a $10.000, saltará error y no le permitirá extraer más del monto definido.
+			
             🔸Si el monto de la extracción es menor a $10.000, pero hace que el total extraído en el día supere los $20.000, la extracción no podrá realizarse y el programa mostrará el total de dinero disponible a retirar.
+			
             🔸Una vez llegado a $20.000 en extracción, no dejará que el usuario realice más extracciones.
 
 🔶Si el usuario ingresa la “opción 4”:
