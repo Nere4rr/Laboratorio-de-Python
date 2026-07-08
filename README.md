@@ -41,33 +41,29 @@ Primero, pide al usuario la autenticación para ingresar a la cuenta, permite ha
 
 🟢 Condicionales (If, Elif, Else)
 
-if opcion == 1:
-
-…
-
-Elif opcion == 2:
-
-…
-
+	if opcion == 1:
+	…
+	Elif opcion == 2:
+	…
 🟢 Bucles (While, for)
 	
-While true:
-		…
+	While true:
+	…
 
 
 🟢Funciones (def)
 
 
-def usuario(usuario, clave):
-		…
+	def usuario(usuario, clave):
+			…
 
 
 🟢Manejo de registros y archivos
 
-archivo = open(arch_usu, "w", encoding="utf-8")
-    archivo.write("admin;1234;50000;Administrador\n")
-    archivo.write("alumno;0000;15000;Usuario Prueba\n")
-archivo.close()
+	archivo = open(arch_usu, "w", encoding="utf-8")
+	    archivo.write("admin;1234;50000;Administrador\n")
+	    archivo.write("alumno;0000;15000;Usuario Prueba\n")
+	archivo.close()
 
 
 
@@ -123,11 +119,11 @@ Una vez logueado en el programa, se desplegará un menú. Donde el usuario puede
 
 En general, utilizamos la inteligencia artificial (Code copilot)  para corroborar si algunas partes del código estaban correctamente definidas.
 🟡Ej.: En el tratamiento del archivo y registro
- 
-archivo = open(arch_usu, "w", encoding="utf-8")
+
+	archivo = open(arch_usu, "w", encoding="utf-8")
   	  archivo.write("admin;1234;50000;Administrador\n")
     	archivo.write("alumno;0000;15000;Usuario Prueba\n")
-archivo.close()
+	archivo.close()
 
 La utilizamos para poder hacer pruebas de escritorio en el pseudocódigo desarrollado como borrador.
 Para corregir errores de sintaxis, como en la definición de archivos o los bucles.
