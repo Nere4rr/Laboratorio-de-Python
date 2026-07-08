@@ -71,24 +71,26 @@ Primero, pide al usuario la autenticación para ingresar a la cuenta, permite ha
 ⭐ Instrucciones de ejecución del programa ⭐
 
 Una vez ejecutado el programa se le pedirá al usuario ingresar “Nombre de usuario” y “contraseña”. Existen dos usuarios de prueba disponibles para el simulador:
-Nombre: admin
-Contraseña: 1234
-Nombre: alumno
-Contraseña: 0000
+
+	Nombre: admin
+	Contraseña: 1234
+	Nombre: alumno
+	Contraseña: 0000
 
 (Nota: Este programa diferencia minúsculas y mayúsculas, ingresar la clave como se indica)
 
 El usuario tiene 3 intentos posibles para ingresar, de lo contrario se bloqueará el acceso y finalizará la ejecución al programa.
 Una vez logueado en el programa, se desplegará un menú. Donde el usuario puede seleccionar alguna opción disponible (desde la opción 1 hasta la 6), si ingresa una opción no disponible saltará un error.
 
-	El menú disponible es el siguiente:
---- MENÚ PRINCIPAL ---
-1. Consultar saldo
-2. Depositar dinero
-3. Extraer dinero
-4. Transferir dinero
-5. Ver Registro de Operaciones
-6. Salir
+El menú disponible es el siguiente:
+
+	--- MENÚ PRINCIPAL ---
+	1. Consultar saldo
+	2. Depositar dinero
+	3. Extraer dinero
+	4. Transferir dinero
+	5. Ver Registro de Operaciones
+	6. Salir
 
 🔶Si el usuario ingresa la “opción 1” se le mostrará el saldo actual en su cuenta.
 
