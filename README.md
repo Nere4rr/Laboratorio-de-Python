@@ -76,7 +76,7 @@ Primero, pide al usuario la autenticación para ingresar a la cuenta, permite ha
 
        python cajero_automatico.py
 
-7. Darle a enter una vez terminado de escribir en la terminal.
+7. Apretar enter 
 
 
 ⭐ Instrucciones de ejecución del programa ⭐
