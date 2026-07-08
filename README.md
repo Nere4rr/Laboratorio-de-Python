@@ -12,7 +12,7 @@ Repositorio del grupo C 35. Aquí encontrará el desarrollo del taller de Python
 
 ⭐¿Qué se encuentra en este repositorio?⭐
 
-En este repositorio se encuentra un simulador del funcionamiento básico de un cajero automático, desarrollado en Python, que permite a un usuario predefinido autenticarse y realizar operaciones bancarias simples como consultar saldo, depositar, extraer y transferir dinero. Además podemos encontrar el README (este archivo) que contiene un "informe" del sistema.
+En este repositorio se encuentra un simulador del funcionamiento básico de un cajero automático, desarrollado en Python, que permite a un usuario predefinido autenticarse y realizar operaciones bancarias simples como consultar saldo, depositar, extraer y transferir dinero. Además, podemos encontrar el README (este archivo) que contiene un "informe" del sistema.
 
 
 ⭐Función general del sistema⭐
