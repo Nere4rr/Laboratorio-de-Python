@@ -40,9 +40,13 @@ Primero, pide al usuario la autenticación para ingresar a la cuenta, permite ha
 ⭐ Estructuras utilizadas en el desarrollo del código:⭐
 
 🟢 Condicionales (If, Elif, Else)
+
 if opcion == 1:
+
 …
+
 Elif opcion == 2:
+
 …
 
 🟢 Bucles (While, for)
@@ -50,12 +54,16 @@ Elif opcion == 2:
 While true:
 		…
 
+
 🟢Funciones (def)
+
 
 def usuario(usuario, clave):
 		…
 
+
 🟢Manejo de registros y archivos
+
 archivo = open(arch_usu, "w", encoding="utf-8")
     archivo.write("admin;1234;50000;Administrador\n")
     archivo.write("alumno;0000;15000;Usuario Prueba\n")
